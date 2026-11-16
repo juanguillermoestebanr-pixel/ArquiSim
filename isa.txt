@@ -80,3 +80,26 @@ nop    R  000000  000000  -                        sll
 li     I  001000  -       rt,imm,rs=$zero          addi
 la     I  001000  -       rt,imm,rs=$zero          addi
 b      I  000100  -       label,rs=$zero,rt=$zero  beq
+add    R  000000  100000  rd+rs,rt
+sub    R  000000  100010  rd+rs,rt
+and    R  000000  100100  rd+rs,rt
+or     R  000000  100101  rd+rs,rt
+addi   I  001000  -       rt+rs,imm
+add    R  000000  110000  rt          adda
+sub    R  000000  110010  rt          suba
+addi   I  011000  -       imm         addia
+mtacc  R  000000  010101  rs
+mfacc  R  000000  010100  rd
+cmp    R  000000  110100  rs,rt
+jz     J  010100  -       label
+jn     J  010101  -       label
+jc     J  010110  -       label
+jv     J  010111  -       label
+mult   R  000000  011000  rs,rt
+multu  R  000000  011001  rs,rt
+div    R  000000  011010  rs,rt
+divu   R  000000  011011  rs,rt
+mfhi   R  000000  010000  rd
+mflo   R  000000  010010  rd
+mul    R  011100  000010  rd,rs,rt
+syscall R 000000  001100  -

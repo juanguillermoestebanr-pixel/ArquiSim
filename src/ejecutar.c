@@ -35,6 +35,7 @@
  */
 #include <string.h>
 #include "cpu.h"
+#include "sistema.h"
 
 static int es(const Instruccion *in, const char *mnemonico)
 {
@@ -217,6 +218,75 @@ if (es(in, "jr")) {
     cpu->pc = cpu->reg[in->rs];
     return OK;
 }
+    if (es(in, "adda")) {
+        cpu->acc = sumar_con_banderas(cpu, cpu->acc, cpu->reg[in->rt]);
+        return OK;
+    }
+    if (es(in, "suba")) {
+        cpu->acc = restar_con_banderas(cpu, cpu->acc, cpu->reg[in->rt]);
+        return OK;
+    }
+    if (es(in, "addia")) {
+        cpu->acc = sumar_con_banderas(cpu, cpu->acc, (uint32_t)in->simm);
+        return OK;
+    }
+    if (es(in, "mtacc")) {
+        cpu->acc = cpu->reg[in->rs];
+        return OK;
+    }
+    if (es(in, "mfacc")) {
+        escribir_registro(cpu, in->rd, cpu->acc);
+        return OK;
+    }
+    if (es(in, "cmp")) {
+        restar_con_banderas(cpu, cpu->reg[in->rs], cpu->reg[in->rt]);
+        return OK;
+    }
+    if (es(in, "jz") || es(in, "jn") || es(in, "jc") || es(in, "jv")) {
+        int b = es(in, "jz") ? BANDERA_Z : es(in, "jn") ? BANDERA_N : es(in, "jc") ? BANDERA_C : BANDERA_V;
+        if (cpu->banderas & b)
+            cpu->pc = (cpu->pc & 0xF0000000u) | (in->direccion << 2);
+        return OK;
+    }
+    if (es(in, "mult")) {
+        int64_t p = (int64_t)(int32_t)cpu->reg[in->rs] * (int64_t)(int32_t)cpu->reg[in->rt];
+        cpu->hi = (uint32_t)((uint64_t)p >> 32);
+        cpu->lo = (uint32_t)p;
+        return OK;
+    }
+    if (es(in, "multu")) {
+        uint64_t p = (uint64_t)cpu->reg[in->rs] * (uint64_t)cpu->reg[in->rt];
+        cpu->hi = (uint32_t)(p >> 32);
+        cpu->lo = (uint32_t)p;
+        return OK;
+    }
+    if (es(in, "div") || es(in, "divu")) {
+        if (cpu->reg[in->rt] == 0)
+            return excepcion(cpu, "división entre cero en %s", in->def->nombre);
+        if (es(in, "div")) {
+            int64_t a = (int32_t)cpu->reg[in->rs], b = (int32_t)cpu->reg[in->rt];
+            cpu->lo = (uint32_t)(a / b);
+            cpu->hi = (uint32_t)(a % b);
+        } else {
+            cpu->lo = cpu->reg[in->rs] / cpu->reg[in->rt];
+            cpu->hi = cpu->reg[in->rs] % cpu->reg[in->rt];
+        }
+        return OK;
+    }
+    if (es(in, "mfhi")) {
+        escribir_registro(cpu, in->rd, cpu->hi);
+        return OK;
+    }
+    if (es(in, "mflo")) {
+        escribir_registro(cpu, in->rd, cpu->lo);
+        return OK;
+    }
+    if (es(in, "mul")) {
+        escribir_registro(cpu, in->rd, cpu->reg[in->rs] * cpu->reg[in->rt]);
+        return OK;
+    }
+    if (es(in, "syscall"))
+        return llamar_sistema(cpu);
     /*
      * TODO: para cada instrucción nueva
      *   1. agregue su línea en isa.txt (formato, opcode, funct, operandos)
