@@ -62,6 +62,101 @@ Resultado ejecutar(CPU *cpu, const Instruccion *in)
         return OK;
     }
 
+    if (es(in, "sub")) {
+        uint32_t r = restar_con_banderas(cpu, cpu->reg[in->rs], cpu->reg[in->rt]);
+        if (cpu->banderas & BANDERA_V)
+            return excepcion(cpu, "desbordamiento aritmético en sub");
+        escribir_registro(cpu, in->rd, r);
+        return OK;
+    }
+if (es(in, "and")) {
+    uint32_t r = cpu->reg[in->rs] & cpu->reg[in->rt];
+    banderas_logicas(cpu, r);
+    escribir_registro(cpu, in->rd, r);
+    return OK;
+}
+if (es(in, "or")) {
+    uint32_t r = cpu->reg[in->rs] | cpu->reg[in->rt];
+    banderas_logicas(cpu, r);
+    escribir_registro(cpu, in->rd, r);
+    return OK;
+}
+
+if (es(in, "xor")) {
+    uint32_t r = cpu->reg[in->rs] ^ cpu->reg[in->rt];
+    banderas_logicas(cpu, r);
+    escribir_registro(cpu, in->rd, r);
+    return OK;
+}
+
+if (es(in, "nor")) {
+    uint32_t r = ~(cpu->reg[in->rs] | cpu->reg[in->rt]);
+    banderas_logicas(cpu, r);
+    escribir_registro(cpu, in->rd, r);
+    return OK;
+}
+if (es(in, "sll")) {
+    uint32_t r = cpu->reg[in->rt] << in->shamt;
+    banderas_logicas(cpu, r);
+    escribir_registro(cpu, in->rd, r);
+    return OK;
+}
+
+if (es(in, "srl")) {
+    uint32_t r = cpu->reg[in->rt] >> in->shamt;
+    banderas_logicas(cpu, r);
+    escribir_registro(cpu, in->rd, r);
+    return OK;
+}
+
+if (es(in, "sra")) {
+    uint32_t r = (uint32_t)((int32_t)cpu->reg[in->rt] >> in->shamt);
+    banderas_logicas(cpu, r);
+    escribir_registro(cpu, in->rd, r);
+    return OK;
+}
+if (es(in, "andi")) {
+    uint32_t r = cpu->reg[in->rs] & in->imm;
+    banderas_logicas(cpu, r);
+    escribir_registro(cpu, in->rt, r);
+    return OK;
+}
+
+if (es(in, "ori")) {
+    uint32_t r = cpu->reg[in->rs] | in->imm;
+    banderas_logicas(cpu, r);
+    escribir_registro(cpu, in->rt, r);
+    return OK;
+}
+
+if (es(in, "xori")) {
+    uint32_t r = cpu->reg[in->rs] ^ in->imm;
+    banderas_logicas(cpu, r);
+    escribir_registro(cpu, in->rt, r);
+    return OK;
+}
+
+if (es(in, "lui")) {
+    escribir_registro(cpu, in->rt, (uint32_t)in->imm << 16);
+    return OK;
+}
+if (es(in, "addu")) {
+    uint32_t r = sumar_con_banderas(cpu, cpu->reg[in->rs], cpu->reg[in->rt]);
+    escribir_registro(cpu, in->rd, r);
+    return OK;
+}
+
+if (es(in, "subu")) {
+    uint32_t r = restar_con_banderas(cpu, cpu->reg[in->rs], cpu->reg[in->rt]);
+    escribir_registro(cpu, in->rd, r);
+    return OK;
+}
+
+if (es(in, "addiu")) {
+    uint32_t r = sumar_con_banderas(cpu, cpu->reg[in->rs], (uint32_t)in->simm);
+    escribir_registro(cpu, in->rt, r);
+    return OK;
+}
     /*
      * TODO: para cada instrucción nueva
      *   1. agregue su línea en isa.txt (formato, opcode, funct, operandos)
