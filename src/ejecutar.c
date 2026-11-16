@@ -157,6 +157,29 @@ if (es(in, "addiu")) {
     escribir_registro(cpu, in->rt, r);
     return OK;
 }
+if (es(in, "lw")) {
+    uint32_t valor;
+    if (leer_palabra(cpu, cpu->reg[in->rs] + (uint32_t)in->simm, &valor) != OK)
+        return EXCEPCION;
+    escribir_registro(cpu, in->rt, valor);
+    return OK;
+}
+
+if (es(in, "sw"))
+    return escribir_palabra(cpu, cpu->reg[in->rs] + (uint32_t)in->simm, cpu->reg[in->rt]);
+if (es(in, "lb") || es(in, "lbu")) {
+    uint8_t byte;
+    if (leer_byte(cpu, cpu->reg[in->rs] + (uint32_t)in->simm, &byte) != OK)
+        return EXCEPCION;
+    if (es(in, "lb"))
+        escribir_registro(cpu, in->rt, (uint32_t)(int32_t)(int8_t)byte);
+    else
+        escribir_registro(cpu, in->rt, byte);
+    return OK;
+}
+
+if (es(in, "sb"))
+    return escribir_byte(cpu, cpu->reg[in->rs] + (uint32_t)in->simm, (uint8_t)cpu->reg[in->rt]);
     /*
      * TODO: para cada instrucción nueva
      *   1. agregue su línea en isa.txt (formato, opcode, funct, operandos)

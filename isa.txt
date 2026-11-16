@@ -60,3 +60,8 @@ andi   I  001100  -       rt,rs,imm
 ori    I  001101  -       rt,rs,imm
 xori   I  001110  -       rt,rs,imm
 lui    I  001111  -       rt,imm
+lw     I  100011  -       rt,imm(rs)
+sw     I  101011  -       rt,imm(rs)
+lb     I  100000  -       rt,imm(rs)
+lbu    I  100100  -       rt,imm(rs)
+sb     I  101000  -       rt,imm(rs)
