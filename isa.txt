@@ -65,3 +65,18 @@ sw     I  101011  -       rt,imm(rs)
 lb     I  100000  -       rt,imm(rs)
 lbu    I  100100  -       rt,imm(rs)
 sb     I  101000  -       rt,imm(rs)
+beq    I  000100  -       rs,rt,label
+bne    I  000101  -       rs,rt,label
+slt    R  000000  101010  rd,rs,rt
+sltu   R  000000  101011  rd,rs,rt
+slti   I  001010  -       rt,rs,imm
+j      J  000010  -       label
+jal    J  000011  -       label
+jr     R  000000  001000  rs
+move   R  000000  100000  rd,rs,rt=$zero           add
+not    R  000000  100111  rd,rs,rt=$zero           nor
+clear  R  000000  100000  rd,rs=$zero,rt=$zero     add
+nop    R  000000  000000  -                        sll
+li     I  001000  -       rt,imm,rs=$zero          addi
+la     I  001000  -       rt,imm,rs=$zero          addi
+b      I  000100  -       label,rs=$zero,rt=$zero  beq
